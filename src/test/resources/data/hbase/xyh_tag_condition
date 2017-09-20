@@ -1,0 +1,16 @@
+##空格被忽略
+##  rowkey    base:（ptRule,family,quality）  org(schoolId,structId)
+##第一行定义列的顺序
+## hbase 的语法是  family1(quality1,quality2) family2(quality1,quality2) ...
+## mysql 的语法是  column1 column2  ...
+## 第二行到末尾
+## 数据
+##数据格式 以类似表格的形式来插入数据  如果该cell没有数据，则为空即可
+##两个cell之间用|间隔
+##两个row之间用换行区分
+hbase
+base(ptRule,family,quality) org(schoolId,structId)
+role:1          |every_day      |count         |   every_day_uv|             1|      schoolId1|        structId1|
+role:2          |every_day      |count         |   every_day_uv|             1|      schoolId1|        structId2|
+1               |every_day      |count         |   every_day_uv|             1|      schoolId1|        structId3|
+2               |every_day      |count         |   every_day_uv|             1|      schoolId1|        structId4|
