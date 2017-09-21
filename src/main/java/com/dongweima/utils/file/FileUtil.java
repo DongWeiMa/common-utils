@@ -28,7 +28,7 @@ public class FileUtil {
       String value;
       while ((value = br.readLine()) != null) {
         if (!value.trim().startsWith("#") && !value.trim().equals("")) {
-          list.add(value.trim());
+          list.add(value);
         }
       }
     } catch (Exception e) {
