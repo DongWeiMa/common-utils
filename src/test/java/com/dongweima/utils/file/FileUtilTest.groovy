@@ -31,6 +31,26 @@ class FileUtilTest extends Specification {
     paths.size() == 2
   }
 
+  void "test creat file"() {
+    given:
+    String filePath = "a/test.txt";
+    File file = new File(PathUtil.getBaseDir(), filePath)
+    if (file.exists()) {
+      file.delete()
+    }
+
+    when:
+    FileUtil.createFileInClassPath(file.getPath())
+
+    then:
+    file.exists()
+
+    cleanup:
+    if (file.exists()) {
+      file.delete()
+    }
+  }
+
 }
 
 //Generated with love by TestMe :) Please report issues and submit feature requests at: http://weirddev.com/forum#!/testme
