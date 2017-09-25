@@ -4,7 +4,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.apache.commons.digester.annotations.rules.SetTop;
 
+
+@ToString
+@EqualsAndHashCode
 public class Family {
 
   private String name;
@@ -35,7 +41,7 @@ public class Family {
   public void addQualifier(String qualifierName) {
     Qualifier qualifier = qualifiers.get(qualifierName);
     if (qualifier == null) {
-      qualifier = new Qualifier(qualifierName);
+      qualifier = new Qualifier(qualifierName, null);
       qualifiers.put(qualifierName, qualifier);
     }
   }

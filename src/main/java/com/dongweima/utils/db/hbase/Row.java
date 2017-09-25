@@ -4,7 +4,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
+@ToString
+@EqualsAndHashCode
 public class Row {
 
   private String rowKey;
@@ -50,7 +54,7 @@ public class Row {
     }
     Qualifier qualifier = family.getQualifier(qualifierName);
     if (qualifier == null) {
-      qualifier = new Qualifier(qualifierName);
+      qualifier = new Qualifier(qualifierName, null);
       family.addQualifier(qualifier);
     }
     qualifier.setValue(value);
@@ -65,6 +69,7 @@ public class Row {
     }
     return value;
   }
+
   public Row shallowCopy(){
     Row row = new Row();
     row.families = this.families;
