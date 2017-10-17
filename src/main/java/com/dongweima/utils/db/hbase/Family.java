@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.ToString;
 import org.apache.commons.digester.annotations.rules.SetTop;
 
@@ -34,7 +35,6 @@ public class Family {
   }
 
   public Qualifier getQualifier(String qualifierName) {
-
     return qualifiers.get(qualifierName);
   }
 
@@ -47,6 +47,9 @@ public class Family {
   }
 
   public void addQualifier(Qualifier qualifier) {
+    if (qualifier == null) {
+      return;
+    }
     if (qualifiers.get(qualifier.getName()) == null) {
       qualifiers.put(qualifier.getName(), qualifier);
     }
