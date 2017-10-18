@@ -7,6 +7,10 @@ import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+/**
+ * @author dongweima
+ */
+@SuppressWarnings("unused")
 @ToString
 @EqualsAndHashCode
 public class Row {
@@ -15,7 +19,7 @@ public class Row {
   private Map<String, Family> families;
 
   public Row() {
-    families = new HashMap<String, Family>();
+    families = new HashMap<>();
   }
 
   public String getRowKey() {
@@ -28,14 +32,16 @@ public class Row {
 
   public Family getFamily(String family) {
     if (families == null) {
-      families = new HashMap<String, Family>();
+      families = new HashMap<>(16);
     }
     return families.get(family);
   }
 
-  //todo 这里最好copy一下,而不是直接暴露
+  /**
+   * todo 这里最好copy一下,而不是直接暴露
+   */
   public List<Family> getFamilies() {
-    return new LinkedList<Family>(families.values());
+    return new LinkedList<>(families.values());
   }
 
   public void addFamily(Family family) {

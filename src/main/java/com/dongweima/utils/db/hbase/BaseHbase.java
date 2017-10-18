@@ -20,20 +20,34 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class HbaseBase {
+/**
+ * hbase简化操作的基础类.
+ *
+ * @author dongweima
+ */
+public abstract class BaseHbase {
 
-  private static final Logger log = LoggerFactory.getLogger(HbaseBase.class);
+  private static final Logger log = LoggerFactory.getLogger(BaseHbase.class);
 
+  /**
+   * 获取连接.
+   *
+   * @return 连接
+   */
   public Connection getConnection() {
     try {
-      Connection connection = ConnectionFactory.createConnection(getConf());
-      return connection;
+      return ConnectionFactory.createConnection(getConf());
     } catch (Exception e) {
       log.error("获取连接失败", e);
     }
     return null;
   }
 
+  /**
+   * 删除表.
+   *
+   * @param tableName 表名
+   */
   public void dropTable(String tableName) {
     TableName tn = TableName.valueOf(tableName);
 
@@ -56,6 +70,12 @@ public abstract class HbaseBase {
     }
   }
 
+  /**
+   * 创建表.
+   *
+   * @param tableName 表名
+   * @param families 列名构成的数组
+   */
   public void createTable(String tableName, String[] families) {
     TableName tn = TableName.valueOf(tableName);
     Connection connection = getConnection();
@@ -63,11 +83,11 @@ public abstract class HbaseBase {
     try {
       admin = connection.getAdmin();
       if (!admin.tableExists(tn)) {
-        HTableDescriptor tableDescriptor = new HTableDescriptor(tableName);
+
+        HTableDescriptor tableDescriptor = new HTableDescriptor(tn);
         if (families != null) {
           for (String family : families) {
-            HColumnDescriptor hColumnDescriptor = new HColumnDescriptor(family);
-            tableDescriptor.addFamily(hColumnDescriptor);
+            tableDescriptor.addFamily(new HColumnDescriptor(family));
           }
         }
         admin.createTable(tableDescriptor);
@@ -79,6 +99,12 @@ public abstract class HbaseBase {
     }
   }
 
+  /**
+   * 判断表是否存在.
+   *
+   * @param tableName 表名.
+   * @return true 存在 false 不存在
+   */
   public boolean tableExist(String tableName) {
     Connection connection = getConnection();
     Admin admin = null;
@@ -95,6 +121,12 @@ public abstract class HbaseBase {
     return flag;
   }
 
+  /**
+   * 命名空间是否存在.
+   *
+   * @param namespace 命名空间.
+   * @return true 存在 false 不存在
+   */
   public boolean namespaceExist(String namespace) {
     Connection connection = getConnection();
     Admin admin = null;
@@ -113,6 +145,11 @@ public abstract class HbaseBase {
     return flag;
   }
 
+  /**
+   * 插入一行数据.
+   * @param tableName 表名
+   * @param row 一行数据
+   */
   public void put(String tableName, Row row) {
     Table table = null;
     Connection connection = null;
@@ -136,11 +173,16 @@ public abstract class HbaseBase {
 
   }
 
+  /**
+   * 扫描操作,读取数据.
+   * @param obj  扫描所需的信息,包括过滤器和rowkey,列簇,列的信息.
+   * @return 返回行的集合
+   */
   public List<Row> scan(HbaseObj obj) {
     Table table = null;
     ResultScanner results = null;
     Scan scan = new Scan();
-    List<Row> list = new LinkedList<Row>();
+    List<Row> list = new LinkedList<>();
     Long startTime = System.currentTimeMillis();
     scan.setReversed(obj.getIsReversed());
     if (obj.getStartRow() != null) {
@@ -157,7 +199,8 @@ public abstract class HbaseBase {
         scan.addColumn(family.getName().getBytes(), qulifier.getName().getBytes());
       }
     }
-    scan.setCaching(100);//告诉扫描器最大缓存行数
+    //告诉扫描器最大缓存行数
+    scan.setCaching(100);
     //scan.setBatch(100);每行最多的列数
     scan.setMaxVersions(1);
     Connection connection = getConnection();
@@ -191,17 +234,13 @@ public abstract class HbaseBase {
         row.setCellValue(family, qualifier, value);
       }
     }
-    /*for (Family family : obj.getFamilies()) {
-      for (Qualifier qulifier : family.getQualifiers()) {
-        String value = Bytes
-            .toString(result.getValue(family.getName().getBytes(), qulifier.getName().getBytes()));
-        row.setCellValue(family.getName(), qulifier.getName(), value);
-      }
-    }*/
     return row;
   }
 
-  //todo 判断namespace是否存在
+  /**
+   * 判断namespace是否存在.
+   * @param name 命名空间的名称
+   */
   public void createNameSpace(String name) {
     Connection connection = getConnection();
     Admin admin = null;
@@ -216,30 +255,54 @@ public abstract class HbaseBase {
     }
   }
 
+  /**
+   * 关闭连接.
+   * @param connection  连接
+   * @param table  表
+   * @param results 集合 
+   */
   public void close(Connection connection, Table table, ResultScanner results) {
     close(results);
     close(table);
     close(connection);
-
   }
 
+  /**
+   *  关闭连接.
+   * @param connection 连接
+   * @param admin admin
+   * @param table 表
+   */
   public void close(Connection connection, Admin admin, Table table) {
     close(table);
     close(admin);
     close(connection);
-
   }
 
+  /**
+   * 关闭连接.
+   * @param connection  连接
+   * @param admin admin
+   */
   public void close(Connection connection, Admin admin) {
     close(admin);
     close(connection);
   }
 
+  /**
+   * 关闭连接.
+   * @param connection  连接
+   * @param table 表
+   */
   public void close(Connection connection, Table table) {
     close(table);
     close(connection);
   }
 
+  /**
+   * 关闭连接.
+   * @param connection  连接
+   */
   public void close(Connection connection) {
     if (connection != null) {
       try {
@@ -250,6 +313,10 @@ public abstract class HbaseBase {
     }
   }
 
+  /**
+   * 关闭连接.
+   * @param results  结果
+   */
   public void close(ResultScanner results) {
     if (results != null) {
       try {
@@ -260,6 +327,10 @@ public abstract class HbaseBase {
     }
   }
 
+  /**
+   * 关闭连接.
+   * @param table 结果
+   */
   public void close(Table table) {
     if (table != null) {
       try {
@@ -270,6 +341,10 @@ public abstract class HbaseBase {
     }
   }
 
+  /**
+   * 关闭连接.
+   * @param admin admin
+   */
   public void close(Admin admin) {
     if (admin != null) {
       try {
@@ -280,7 +355,9 @@ public abstract class HbaseBase {
     }
   }
 
+  /**
+   * 获取连接配置类.
+   * @return 配置类
+   */
   public abstract Configuration getConf();
-
-
 }

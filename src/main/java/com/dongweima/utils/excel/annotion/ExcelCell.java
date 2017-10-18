@@ -15,12 +15,8 @@ import java.lang.annotation.Target;
 public @interface ExcelCell {
 
   /**
-   * 单元格所属于的列的名称
+   * 单元格所属于的列的名称,也可以是名称的一部分.
+   * 第一个名称在导出时作为列名.
    */
   String[] name() default {};
-
-  /**
-   * 单元格所属列的名称的一部分内容. 在解析excel时用来匹配
-   */
-  String[] contains() default {};
 }

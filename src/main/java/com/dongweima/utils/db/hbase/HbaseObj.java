@@ -10,7 +10,11 @@ import lombok.ToString;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
 
-@ToString
+/**
+ * hbase 查询信息类.
+ *
+ * @author dongweima
+ */
 @EqualsAndHashCode
 public class HbaseObj {
 
@@ -22,7 +26,7 @@ public class HbaseObj {
   private boolean isReversed = false;
 
   public HbaseObj() {
-    families = new HashMap<String, Family>();
+    families = new HashMap<>();
   }
 
   public boolean getIsReversed() {
@@ -91,7 +95,7 @@ public class HbaseObj {
   }
 
   public List<Family> getFamilies() {
-    return new LinkedList<Family>(families.values());
+    return new LinkedList<>(families.values());
   }
 
   public void setFamilies(List<Family> families) {

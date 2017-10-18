@@ -8,9 +8,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+/**
+ * @author dongweima
+ */
+@SuppressWarnings("unused")
 public class JsonFileUtil {
 
-  //把json格式的字符串写到文件
   public static void writeJsonFile(String filePath, String sets) throws IOException {
     FileWriter fw = null;
     PrintWriter out = null;
@@ -29,7 +32,6 @@ public class JsonFileUtil {
       if (out != null) {
         out.close();
       }
-      ;
     }
 
   }
@@ -40,14 +42,14 @@ public class JsonFileUtil {
 
   public static String readFile(String path) {
     BufferedReader reader = null;
-    String laststr = "";
+    StringBuilder laststr = new StringBuilder();
     try {
       FileInputStream fileInputStream = new FileInputStream(path);
       InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
       reader = new BufferedReader(inputStreamReader);
-      String tempString = null;
+      String tempString;
       while ((tempString = reader.readLine()) != null) {
-        laststr += tempString;
+        laststr.append(tempString);
       }
       reader.close();
     } catch (IOException e) {
@@ -61,7 +63,7 @@ public class JsonFileUtil {
         }
       }
     }
-    return laststr;
+    return laststr.toString();
   }
 }
 

@@ -1,12 +1,15 @@
 package com.dongweima.utils.json;
 
+/**
+ * @author dongweima
+ */
+@SuppressWarnings("unused")
 public class JsonStringUtil {
 
   /**
-   * 将字符串格式化成JSON的格式. 将一行的json变成展开的json
+   * 将字符串格式化成JSON的格式. 将一行的json变成展开的json.
    */
   public static String stringToJson(String strJson) {
-    // 计数tab的个数
     int tabNum = 0;
     StringBuilder jsonFormat = new StringBuilder();
     int length = strJson.length();

@@ -38,10 +38,10 @@ public class ReflectUtil {
 
     try {
       Field field = o.getClass().getDeclaredField(fieldName);
-      boolean accessFlag = field.isAccessible();// 获得原始权限
-      field.setAccessible(true);// 权限设置为可访问
+      boolean accessFlag = field.isAccessible();
+      field.setAccessible(true);
       key = field.get(o);
-      field.setAccessible(accessFlag);// 还原权限
+      field.setAccessible(accessFlag);
     } catch (Exception e) {
       LOGGER.debug(e.getMessage(), e);
       throw e;
@@ -58,8 +58,10 @@ public class ReflectUtil {
     try {
       Class clazz = o.getClass();
       Method method = clazz.getMethod(setMethodName(clazz, fieldName));
+      boolean accessFlag = method.isAccessible();
       method.setAccessible(true);
       method.invoke(o, param);
+      method.setAccessible(accessFlag);
       return;
     } catch (Exception e) {
       LOGGER.debug("反射失败");
@@ -69,10 +71,10 @@ public class ReflectUtil {
     //失败则尝试使用field直接设置
     try {
       Field field = o.getClass().getDeclaredField(fieldName);
-      boolean accessFlag = field.isAccessible();// 获得原始权限
-      field.setAccessible(true);// 权限设置为可访问
+      boolean accessFlag = field.isAccessible();
+      field.setAccessible(true);
       field.set(o, param);
-      field.setAccessible(accessFlag);// 还原权限
+      field.setAccessible(accessFlag);
     } catch (Exception e) {
       LOGGER.debug(e.getMessage(), e);
       throw e;

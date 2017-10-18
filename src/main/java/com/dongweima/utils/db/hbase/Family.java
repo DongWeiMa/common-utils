@@ -5,11 +5,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import lombok.ToString;
-import org.apache.commons.digester.annotations.rules.SetTop;
 
-
+/**
+ * 列簇.
+ *
+ * @author dongweima
+ */
+@SuppressWarnings("unused")
 @ToString
 @EqualsAndHashCode
 public class Family {
@@ -18,11 +21,11 @@ public class Family {
   private Map<String, Qualifier> qualifiers;
 
   public Family() {
-    qualifiers = new HashMap<String, Qualifier>();
+    qualifiers = new HashMap<>();
   }
 
   public Family(String familyName) {
-    qualifiers = new HashMap<String, Qualifier>();
+    qualifiers = new HashMap<>();
     name = familyName;
   }
 
@@ -38,6 +41,11 @@ public class Family {
     return qualifiers.get(qualifierName);
   }
 
+  /**
+   * 添加列.
+   *
+   * @param qualifierName 列名
+   */
   public void addQualifier(String qualifierName) {
     Qualifier qualifier = qualifiers.get(qualifierName);
     if (qualifier == null) {
@@ -46,16 +54,18 @@ public class Family {
     }
   }
 
+  /**
+   * 添加列.
+   * @param qualifier 列
+   */
   public void addQualifier(Qualifier qualifier) {
     if (qualifier == null) {
       return;
     }
-    if (qualifiers.get(qualifier.getName()) == null) {
-      qualifiers.put(qualifier.getName(), qualifier);
-    }
+    qualifiers.putIfAbsent(qualifier.getName(), qualifier);
   }
 
   public List<Qualifier> getQualifiers() {
-    return new LinkedList<Qualifier>(qualifiers.values());
+    return new LinkedList<>(qualifiers.values());
   }
 }

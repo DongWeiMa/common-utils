@@ -50,7 +50,10 @@ public class ExcelUtil {
     }
     File file = new File(filePath);
     if (!file.exists()) {
-      file.createNewFile();
+      boolean ok = file.createNewFile();
+      if (!ok) {
+        throw new IOException("创建文件失败" + filePath);
+      }
     }
     ExportHeader<T> header = getExportHeader(list.get(0).getClass());
     if (header == null) {
@@ -126,11 +129,7 @@ public class ExcelUtil {
       Header header = getHeader(headerMap, sheetName);
       if (header != null) {
         List list = readSheetToList(sheet, header);
-        Set<List> set = map.get(header.getClazz().getName());
-        if (set == null) {
-          set = new HashSet<>();
-          map.put(header.getClazz().getName(), set);
-        }
+        Set<List> set = map.computeIfAbsent(header.getClazz().getName(), k -> new HashSet<>());
         set.add(list);
       } else {
         LOGGER.info("filepath:{} sheetName:{} 该excel文件没有发现对应的bean", filePath, sheetName);
@@ -307,7 +306,10 @@ public class ExcelUtil {
     try {
       file = new File(filePath);
       if (!file.exists()) {
-        file.createNewFile();
+        boolean ok = file.createNewFile();
+        if (!ok) {
+          throw new IOException("文件创建失败" + filePath);
+        }
       }
       fis = new FileInputStream(file);
       book = getWorkbook(filePath, fis);

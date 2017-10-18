@@ -16,7 +16,7 @@ public class HbaseTestBase {
   private static final HBaseTestingUtility testUtil = new HBaseTestingUtility();
 
   private static final String user_group = "user_group:user_event";
-  private static HbaseBase hbaseBase;
+  private static BaseHbase hbaseBase;
   private static Configuration conf;
 
   @BeforeClass
@@ -24,7 +24,7 @@ public class HbaseTestBase {
     System.setProperty("hadoop.home.dir", "d:\\winutil\\");
     testUtil.startMiniCluster();
     conf = testUtil.getConfiguration();
-    hbaseBase = new HbaseBase() {
+    hbaseBase = new BaseHbase() {
       @Override
       public Configuration getConf() {
         return conf;

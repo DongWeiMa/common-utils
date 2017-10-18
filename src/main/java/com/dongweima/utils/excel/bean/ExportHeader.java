@@ -2,6 +2,7 @@ package com.dongweima.utils.excel.bean;
 
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class ExportHeader<T> {
 
   private String sheetName;
