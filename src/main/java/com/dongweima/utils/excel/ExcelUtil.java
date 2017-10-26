@@ -149,6 +149,7 @@ public class ExcelUtil {
     while (ok && startLine < lastRowNum) {
       Row firstRow = sheet.getRow(startLine);
       Iterator<Cell> ite = firstRow.cellIterator();
+      int sum = 0;
       while (ite.hasNext()) {
         Cell cell = ite.next();
         String name = getValue(cell);
@@ -156,12 +157,15 @@ public class ExcelUtil {
           for (String key : header.getMap().keySet()) {
             if (name.contains(key)) {
               map.put(i, header.getMap().get(key));
-              ok = false;
+              sum++;
               break;
             }
           }
         }
         i++;
+      }
+      if (sum > 2) {
+        ok = false;
       }
       if (ok) {
         i = 0;

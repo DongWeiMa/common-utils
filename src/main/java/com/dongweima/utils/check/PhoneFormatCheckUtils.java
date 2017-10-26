@@ -19,7 +19,6 @@ public class PhoneFormatCheckUtils {
   /**
    * 检查手机号是否违法.
    */
-  @SuppressWarnings("unused")
   public static boolean isPhoneLegal(String str) {
     if (str == null) {
       return false;

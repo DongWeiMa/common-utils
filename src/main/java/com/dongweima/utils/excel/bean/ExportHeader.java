@@ -2,6 +2,9 @@ package com.dongweima.utils.excel.bean;
 
 import java.util.Map;
 
+/**
+ * @author dongweima
+ */
 @SuppressWarnings("unused")
 public class ExportHeader<T> {
 
