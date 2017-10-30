@@ -138,6 +138,25 @@ public class ExcelUtil {
     return map;
   }
 
+  public static <T> List<T> readOnlyOneSheetExcel(String filePath,
+      Class<T> clazz) throws Exception {
+    Header<T> header = getHeader(clazz);
+    if (header != null) {
+      Set<String> sheetNames = header.getSheetNames();
+      if (sheetNames != null && sheetNames.size() > 0) {
+        String sheetName = sheetNames.iterator().next();
+        Workbook workbook = getWorkbook(filePath);
+        if (workbook == null) {
+          return null;
+        }
+        Sheet sheet = workbook.getSheet(sheetName);
+        return readSheetToList(sheet, header);
+      }
+    }
+    return null;
+  }
+
+
   private static <T> List<T> readSheetToList(Sheet sheet, Header<T> header) {
 
     //第一部分 头部

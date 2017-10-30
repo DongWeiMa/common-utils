@@ -154,6 +154,36 @@ public class FileUtil {
     }
   }
 
+  public static void getAllFileByDsf(File dir, List<File> files) {
+    if (!dir.isDirectory()) {
+      files.add(dir);
+      return;
+    }
+    File[] fs = dir.listFiles();
+    if (fs != null && fs.length > 0) {
+      for (File file : fs) {
+        getAllFileByDsf(file, files);
+      }
+    }
+  }
+
+  public static void getAllExcelFileByDsf(File dir, List<File> files) {
+    if (!dir.isDirectory()) {
+      String path = dir.getPath();
+      boolean isExcel = !path.startsWith("~") && (path.endsWith("xls") || path.endsWith("xlsx"));
+      if (isExcel) {
+        files.add(dir);
+      }
+      return;
+    }
+    File[] fs = dir.listFiles();
+    if (fs != null && fs.length > 0) {
+      for (File file : fs) {
+        getAllExcelFileByDsf(file, files);
+      }
+    }
+  }
+
   public static void main(String[] args) throws IOException {
     FileUtil.createFileInClassPath("a/b/c/d/a.txt");
   }
