@@ -1,5 +1,6 @@
 package com.dongweima.utils.excel.bean;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -10,7 +11,7 @@ public class ExportHeader<T> {
 
   private String sheetName;
   private Class<T> clazz;
-  private Map<String, String> map;
+  private LinkedHashMap<String, String> map;
 
   public String getSheetName() {
     return sheetName;
@@ -28,11 +29,11 @@ public class ExportHeader<T> {
     this.clazz = clazz;
   }
 
-  public Map<String, String> getMap() {
+  public LinkedHashMap<String, String> getMap() {
     return map;
   }
 
-  public void setMap(Map<String, String> map) {
+  public void setMap(LinkedHashMap<String, String> map) {
     this.map = map;
   }
 }

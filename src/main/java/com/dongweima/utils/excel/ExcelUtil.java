@@ -12,10 +12,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +68,8 @@ public class ExcelUtil {
       //编辑第一行
       Row row = sheet.createRow(0);
       int i = 0;
-      Map<String, String> map = header.getMap();
+      //todo 改为List<K,V>
+      LinkedHashMap<String, String> map = header.getMap();
       for (String name : map.keySet()) {
         Cell cell = row.createCell(i);
         cell.setCellValue(name);
@@ -108,7 +111,7 @@ public class ExcelUtil {
     for (Class clazz : classes) {
       Header header = getHeader(clazz);
       if (header != null) {
-        Set<String> sheetNames = header.getSheetNames();
+        ArrayList<String> sheetNames = header.getSheetNames();
         if (sheetNames != null) {
           for (String sheetName : sheetNames) {
             headerMap.put(sheetName, header);
@@ -142,7 +145,7 @@ public class ExcelUtil {
       Class<T> clazz) throws Exception {
     Header<T> header = getHeader(clazz);
     if (header != null) {
-      Set<String> sheetNames = header.getSheetNames();
+      ArrayList<String> sheetNames = header.getSheetNames();
       if (sheetNames != null && sheetNames.size() > 0) {
         String sheetName = sheetNames.iterator().next();
         Workbook workbook = getWorkbook(filePath);
@@ -236,10 +239,11 @@ public class ExcelUtil {
     if (sheetArr.length == 0) {
       return null;
     }
-    Set<String> sheetNames = new HashSet<>(Arrays.asList(sheetArr));
+    ArrayList<String> sheetNames = new ArrayList (Arrays.asList(sheetArr));
     Field[] fields = clazz.getDeclaredFields();
     Map<String, String> map = new HashMap<>(1);
     for (Field field : fields) {
+      //
       ExcelCell cell = field.getAnnotation(ExcelCell.class);
       if (cell != null) {
         String[] cellNames = cell.name();
@@ -265,7 +269,7 @@ public class ExcelUtil {
       return null;
     }
     Field[] fields = clazz.getDeclaredFields();
-    Map<String, String> map = new HashMap<>(1);
+    LinkedHashMap<String, String> map = new LinkedHashMap<>(1);
     for (Field field : fields) {
       ExcelCell cell = field.getAnnotation(ExcelCell.class);
       if (cell != null) {

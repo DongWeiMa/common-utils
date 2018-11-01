@@ -1,5 +1,6 @@
 package com.dongweima.utils.excel.bean;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,13 +15,14 @@ public class Header<T> {
    * 记录列名和bean中属性的对应关系. 列名可能有多个.
    */
   private Map<String, String> map;
-  private Set<String> sheetNames;
+  private ArrayList<String> sheetNames;
 
-  public Set<String> getSheetNames() {
+
+  public ArrayList<String>  getSheetNames() {
     return sheetNames;
   }
 
-  public void setSheetNames(Set<String> sheetNames) {
+  public void setSheetNames(ArrayList<String>  sheetNames) {
     this.sheetNames = sheetNames;
   }
 

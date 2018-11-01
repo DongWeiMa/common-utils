@@ -11,13 +11,17 @@
   </parent>
   <groupId>com.dongweima.utils</groupId>
   <artifactId>common-utils</artifactId>
-  <version>1.0.7</version>
-  <name>1111</name>
+  <version>1.0.8</version>
   <properties>
     <hbase-client.version>1.1.10</hbase-client.version>
     <groovy-version>2.4.0</groovy-version>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>com.vip.vjtools</groupId>
+      <artifactId>vjkit</artifactId>
+      <version>1.0.6</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>
@@ -124,6 +128,18 @@
       <version>1.2.9</version>
     </dependency>
   </dependencies>
+  <distributionManagement>
+    <repository>
+      <id>release</id>
+      <name>iZ23brrsba2Z-releases</name>
+      <url>http://121.41.29.250:8081/artifactory/libs-release-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>snapshots</id>
+      <name>iZ23brrsba2Z-snapshots</name>
+      <url>http://121.41.29.250:8081/artifactory/libs-snapshot-local</url>
+    </snapshotRepository>
+  </distributionManagement>
   <repositories>
     <repository>
       <id>apache release</id>
@@ -174,6 +190,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
