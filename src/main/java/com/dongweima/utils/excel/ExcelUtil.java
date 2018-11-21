@@ -160,38 +160,52 @@ public class ExcelUtil {
   }
 
 
+  //todo 取消至少三个列的限制
   private static <T> List<T> readSheetToList(Sheet sheet, Header<T> header) {
-
     //第一部分 头部
+    //最后一行，这个是边界
     int lastRowNum = sheet.getLastRowNum();
+
     int startLine = 0;
     int i = 0;
     Map<Integer, String> map = new HashMap<>(1);
     boolean ok = true;
-    while (ok && startLine < lastRowNum) {
+
+    //为什么不直接是单行呢？因为可能excel的行头被两行合并成一行
+    //也有可能第一行被命名成一个特殊的名字，比如XXX学校
+    while (ok && startLine < lastRowNum ) {
       Row firstRow = sheet.getRow(startLine);
-      Iterator<Cell> ite = firstRow.cellIterator();
       int sum = 0;
-      while (ite.hasNext()) {
-        Cell cell = ite.next();
+      for(Cell cell : firstRow ){
         String name = getValue(cell);
         if (name != null) {
-          for (String key : header.getMap().keySet()) {
-            if (name.contains(key)) {
-              map.put(i, header.getMap().get(key));
-              sum++;
-              break;
+          //先全匹配，再局部匹配
+          Set<String> names =  header.getMap().keySet();
+          if (names.contains(name)){
+            map.put(i, header.getMap().get(name));
+            sum++;
+          }else {
+            for (Map.Entry<String,String> entry : header.getMap().entrySet()) {
+              String key = entry.getKey();
+              if (name.contains(key)) {
+                map.put(i, entry.getValue());
+                sum++;
+                break;
+              }
             }
           }
         }
         i++;
       }
-      if (sum > 2) {
+      if (sum > 0) {
         ok = false;
       }
       if (ok) {
         i = 0;
         startLine++;
+        if (startLine>5){
+          throw new RuntimeException("前5行匹配列名失败，请查看excel具体列名");
+        }
       }
     }
     //第二部分 数据部分
@@ -222,6 +236,12 @@ public class ExcelUtil {
   }
 
   private static Header getHeader(Map<String, Header> map, String sheetName) {
+    //优先是全匹配，再局部匹配
+    for (String key : map.keySet()) {
+      if (sheetName.equals(key)) {
+        return map.get(key);
+      }
+    }
     for (String key : map.keySet()) {
       if (sheetName.contains(key)) {
         return map.get(key);
@@ -230,20 +250,23 @@ public class ExcelUtil {
     return null;
   }
 
+  /**
+   * 导入时的header，以为导入时的数据是多样的,可能不同的名字对应同一个字段
+   */
   private static <T> Header<T> getHeader(Class<T> clazz) {
-    Annotation sheet = clazz.getAnnotation(ExcelSheet.class);
+    ExcelSheet sheet = clazz.getAnnotation(ExcelSheet.class);
     if (sheet == null) {
       return null;
     }
-    String[] sheetArr = ((ExcelSheet) sheet).name();
+    String[] sheetArr = sheet.name();
     if (sheetArr.length == 0) {
-      return null;
+      sheetArr = new String[1];
+      sheetArr[0]="工作表1";
     }
     ArrayList<String> sheetNames = new ArrayList (Arrays.asList(sheetArr));
     Field[] fields = clazz.getDeclaredFields();
     Map<String, String> map = new HashMap<>(1);
     for (Field field : fields) {
-      //
       ExcelCell cell = field.getAnnotation(ExcelCell.class);
       if (cell != null) {
         String[] cellNames = cell.name();
@@ -259,21 +282,26 @@ public class ExcelUtil {
     return header;
   }
 
+  /**
+   * 导出时的header，因为导出时只需要一个sheetName和一个列名，因此多个也只会取第一个
+   */
   private static <T> ExportHeader getExportHeader(Class<T> clazz) {
-    Annotation sheet = clazz.getAnnotation(ExcelSheet.class);
+    ExcelSheet sheet = clazz.getAnnotation(ExcelSheet.class);
     if (sheet == null) {
       return null;
     }
-    String[] sheetArr = ((ExcelSheet) sheet).name();
+    String[] sheetArr = sheet.name();
     if (sheetArr.length == 0) {
-      return null;
+      sheetArr = new String[1];
+      sheetArr[0]="工作表1";
     }
     Field[] fields = clazz.getDeclaredFields();
-    LinkedHashMap<String, String> map = new LinkedHashMap<>(1);
+    LinkedHashMap<String, String> map = new LinkedHashMap<>();
     for (Field field : fields) {
       ExcelCell cell = field.getAnnotation(ExcelCell.class);
       if (cell != null) {
         String[] cellNames = cell.name();
+        //多个名称就只取一个,这里多个是为了读取的时候方便
         map.put(cellNames[0], field.getName());
       }
     }
@@ -357,6 +385,7 @@ public class ExcelUtil {
     } else if (filePath.endsWith(XLS)) {
       return new HSSFWorkbook();
     }
+    //当数据量过大，使用SXSSFWorkbook
     return new XSSFWorkbook();
   }
 
