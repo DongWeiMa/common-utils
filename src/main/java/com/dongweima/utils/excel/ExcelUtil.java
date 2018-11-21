@@ -2,6 +2,7 @@ package com.dongweima.utils.excel;
 
 import com.dongweima.utils.excel.annotion.ExcelCell;
 import com.dongweima.utils.excel.annotion.ExcelSheet;
+import com.dongweima.utils.excel.bean.ExcelIterable;
 import com.dongweima.utils.excel.bean.ExportHeader;
 import com.dongweima.utils.excel.bean.Header;
 import com.dongweima.utils.reflect.ReflectUtil;
@@ -22,11 +23,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.formula.functions.T;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,7 @@ public class ExcelUtil {
   private static final Logger LOGGER = LoggerFactory.getLogger(ExcelUtil.class);
   private static final String XLSX = "xlsx";
   private static final String XLS = "xls";
+  private static final int page_size =1000;
 
   /**
    * 这个解析list到一个excel的方法.
@@ -68,7 +71,6 @@ public class ExcelUtil {
       //编辑第一行
       Row row = sheet.createRow(0);
       int i = 0;
-      //todo 改为List<K,V>
       LinkedHashMap<String, String> map = header.getMap();
       for (String name : map.keySet()) {
         Cell cell = row.createCell(i);
@@ -79,14 +81,7 @@ public class ExcelUtil {
       int rowNum = 0;
       for (T t : list) {
         rowNum++;
-        row = sheet.createRow(rowNum);
-        i = 0;
-        for (String name : map.keySet()) {
-          Cell cell = row.createCell(i);
-          Object fieldValue = ReflectUtil.getFieldValue(map.get(name), t);
-          setValue(cell, fieldValue);
-          i++;
-        }
+        createRow(rowNum,sheet,header,t);
       }
       out = new FileOutputStream(filePath);
       workbook.write(out);
@@ -157,6 +152,62 @@ public class ExcelUtil {
       }
     }
     return null;
+  }
+
+
+  public static <T> void exportBigDataExcel(Class<T> clazz, String filePath,  ExcelIterable<T> iterable)
+          throws Exception {
+
+    if (iterable==null){
+      throw new RuntimeException("ExcelIterable 不能为空");
+    }
+    int pageSize = iterable.getPageSize();
+    if (pageSize>page_size) {
+      throw new RuntimeException("请降低每次刷入excel的行数(不能大于1000行每次)，避免使用过多内存");
+    }
+
+    ExportHeader<T> header = getExportHeader(clazz);
+    if (header == null) {
+      throw new RuntimeException("创建header失败");
+    }
+
+    SXSSFWorkbook wb = new SXSSFWorkbook(pageSize);
+    Sheet sheet = wb.createSheet();
+    Row row = sheet.createRow(0);
+    int i = 0;
+    LinkedHashMap<String, String> map = header.getMap();
+    for (String name : map.keySet()) {
+      Cell cell = row.createCell(  i);
+      cell.setCellValue(name);
+      i++;
+    }
+
+    int rowNum = 0;
+    List<T> subList = new ArrayList<>();
+    while(iterable.hasNext()){
+      iterable.next(subList);
+      for (T t : subList) {
+        rowNum++;
+        createRow(rowNum,sheet,header,t);
+      }
+      subList.clear();
+    }
+    FileOutputStream fileOut = new FileOutputStream(filePath);
+    wb.write(fileOut);
+    fileOut.close();
+    wb.dispose();
+}
+
+ private static <T> void createRow(int rowNum, Sheet sheet , ExportHeader<T> header,T t)throws Exception{
+   Row row = sheet.createRow(rowNum);
+   int i = 0;
+   LinkedHashMap<String, String> map =  header.getMap();
+   for (String name : map.keySet()) {
+     Cell cell = row.createCell(i);
+     Object fieldValue = ReflectUtil.getFieldValue(map.get(name), t);
+     setValue(cell, fieldValue);
+     i++;
+   }
   }
 
 
@@ -368,6 +419,7 @@ public class ExcelUtil {
       }
       fis = new FileInputStream(file);
       book = getWorkbook(filePath, fis);
+      WorkbookFactory.create(file);
     } catch (Throwable e) {
       LOGGER.debug(e.getMessage());
       throw e;

@@ -1,5 +1,6 @@
 package com.dongweima.utils.excel
 
+import com.dongweima.utils.excel.bean.ExcelIterable
 import com.dongweima.utils.file.PathUtil
 import org.junit.Test
 import spock.lang.Specification
@@ -83,6 +84,40 @@ class ExcelUtilTest extends Specification {
   private List<Student> getStudents() {
 
     return students
+  }
+
+  @Test
+  void bigDataTest(){
+    ExcelIterable<Student>  students = new ExcelIterable<Student>(){
+      int i = 0
+      int pageSize=100
+
+      @Override
+      int getPageSize() {
+        return 0
+      }
+
+      boolean hasNext(){
+        if(i<1000000/pageSize){
+          return  true
+        }
+      }
+      void next(List<Student> subList){
+          for(int j=0;j<pageSize;j++){
+            Student student = new Student();
+            student.sex = "男"
+            student.setBirth("2018-10-10")
+            student.setClazz("701")
+            student.setGrade("7")
+            student.setPhone1("18106526227")
+            student.setPhone2("18106526227")
+            student.setName("马东伟")
+            student.setNumber("11111")
+            subList.add(student)
+          }
+      }
+    }
+    ExcelUtil.exportBigDataExcel(Student.class,PathUtil.getBaseDir()+"test.xlsx",students)
   }
 }
 
